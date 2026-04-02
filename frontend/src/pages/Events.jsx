@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import API from "../api";
 
 const CATEGORY_COLORS = {
-  fest: { bg: "#fce7f3", color: "#be185d", icon: "🎉" },
+  fest:     { bg: "#fce7f3", color: "#be185d", icon: "🎉" },
   workshop: { bg: "#dbeafe", color: "#1d4ed8", icon: "🛠️" },
-  seminar: { bg: "#d1fae5", color: "#065f46", icon: "🎤" },
-  sports: { bg: "#ffedd5", color: "#c2410c", icon: "⚽" },
+  seminar:  { bg: "#d1fae5", color: "#065f46", icon: "🎤" },
+  sports:   { bg: "#ffedd5", color: "#c2410c", icon: "⚽" },
   cultural: { bg: "#ede9fe", color: "#6d28d9", icon: "🎭" },
-  other: { bg: "#f3f4f6", color: "var(--text2)", icon: "📌" },
+  exam:     { bg: "#fef3c7", color: "#b45309", icon: "📝" },
+  other:    { bg: "#f3f4f6", color: "var(--text2)", icon: "📌" },
 };
 
 export default function Events({ user }) {
@@ -98,7 +99,7 @@ export default function Events({ user }) {
       </div>
 
       <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-        {["all", "fest", "workshop", "seminar", "sports", "cultural", "other"].map(c => (
+        {["all", "fest", "workshop", "seminar", "sports", "cultural", "exam", "other"].map(c => (
           <button key={c} className={`tab ${filter === c ? "active" : ""}`}
             style={{ padding: "6px 14px", borderRadius: 999, border: "1px solid var(--border)", background: filter === c ? "#4f46e5" : "#fff", color: filter === c ? "#fff" : "#374151", cursor: "pointer", fontSize: "0.8rem", textTransform: "capitalize" }}
             onClick={() => setFilter(c)}>{c}</button>

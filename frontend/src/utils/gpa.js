@@ -1,10 +1,32 @@
 export const GRADE_POINTS = { "A+": 10, "A": 9, "B+": 8, "B": 7, "C+": 6, "C": 5, "F": 0 };
 
-// Average grade points across all result records (each subject weighted equally)
+// Calculate SGPA from a list of results
+// Prioritises end-term results; falls back to all results if no end-term exists
 export const calcSGPA = (results) => {
   if (!results?.length) return "0.00";
-  const total = results.reduce((s, r) => s + (GRADE_POINTS[r.grade] ?? 0), 0);
-  return (total / results.length).toFixed(2);
+  // Use end-term results if available, otherwise use all
+  const endTerm = results.filter(r => r.examType === "end-term");
+  const pool = endTerm.length ? endTerm : results;
+  // Deduplicate by subject — keep highest marks per subject
+  const subjectMap = {};
+  pool.forEach(r => {
+    const key = r.subject?.toLowerCase() || "unknown";
+    if (!subjectMap[key] || r.marksObtained > subjectMap[key].marksObtained) {
+      subjectMap[key] = r;
+    }
+  });
+  const unique = Object.values(subjectMap);
+  const total = unique.reduce((s, r) => s + (GRADE_POINTS[r.grade] ?? 0), 0);
+  return (total / unique.length).toFixed(2);
+};
+
+// Calculate CGPA from all semesters
+export const calcCGPA = (results) => {
+  if (!results?.length) return "0.00";
+  const semesters = groupBySemester(results);
+  if (!semesters.length) return "0.00";
+  const total = semesters.reduce((s, sem) => s + parseFloat(calcSGPA(sem.items)), 0);
+  return (total / semesters.length).toFixed(2);
 };
 
 // Group result records by semester, sorted ascending

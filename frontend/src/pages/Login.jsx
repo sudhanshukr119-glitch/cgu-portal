@@ -116,8 +116,8 @@ export default function Login({ setPage }) {
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 56 }}>
           <div style={{ width: 52, height: 52, borderRadius: 16, background: "linear-gradient(135deg,#6366f1,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", boxShadow: "0 8px 32px rgba(99,102,241,0.4)", flexShrink: 0 }}>🎓</div>
           <div>
-            <p style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.3px", lineHeight: 1 }}>CGU Portal</p>
-            <p style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "2px", marginTop: 3 }}>ERP System</p>
+            <p style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.3px", lineHeight: 1 }}>CGUCampusOne</p>
+            <p style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: "2px", marginTop: 3 }}>CGUCampusOne</p>
           </div>
         </div>
 

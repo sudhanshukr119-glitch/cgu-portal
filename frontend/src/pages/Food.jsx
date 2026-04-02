@@ -3,6 +3,27 @@ import API from "../api";
 
 const CATEGORY_ICON = { breakfast: "🌅", lunch: "🍱", dinner: "🌙", snack: "☕" };
 
+const ITEM_EMOJI = {
+  // Breakfast
+  "Idli Sambar": "🫓", "Masala Dosa": "🫓", "Poha": "🍚", "Upma": "🍜",
+  "Aloo Paratha": "🫓", "Bread Omelette": "🍳", "Puri Bhaji": "🫓",
+  "Rava Idli": "🫓", "Medu Vada": "🍩", "Cornflakes with Milk": "🥣",
+  // Lunch
+  "Dal Rice": "🍚", "Rajma Chawal": "🍚", "Veg Thali": "🍽️",
+  "Chole Bhature": "🫓", "Paneer Butter Masala": "🍛", "Veg Biryani": "🍛",
+  "Kadhi Chawal": "🍚", "Mix Veg Curry + Roti": "🍛", "Egg Curry Rice": "🍳",
+  "South Indian Meals": "🍽️",
+  // Dinner
+  "Roti Sabzi": "🫓", "Paneer Curry": "🍛", "Dal Makhani + Rice": "🍚",
+  "Veg Pulao": "🍛", "Butter Naan + Gravy": "🫓", "Fried Rice": "🍛",
+  "Palak Paneer + Roti": "🍛", "Egg Bhurji + Roti": "🍳",
+  "Khichdi + Papad": "🍚", "Chicken Curry Rice": "🍛",
+  // Snack
+  "Samosa": "🥟", "Tea": "☕", "Cold Coffee": "🧃", "Veg Sandwich": "🥪",
+  "Maggi Noodles": "🍜", "Bread Pakora": "🥞", "Lassi": "🥛",
+  "Fresh Lime Soda": "🍋", "Banana Shake": "🍌", "Pav Bhaji": "🍞",
+};
+
 export default function Food({ user }) {
   const [orders, setOrders]   = useState([]);
   const [menu, setMenu]       = useState([]);
@@ -105,19 +126,24 @@ export default function Food({ user }) {
                   onClick={() => setMealType(m)} style={{ textTransform: "capitalize" }}>{m}</button>
               ))}
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10 }}>
               {filteredMenu.map(item => (
-                <div key={item._id} className="card" style={{ textAlign: "center", padding: 16 }}>
-                  <div style={{ fontSize: "2rem", marginBottom: 8 }}>{CATEGORY_ICON[item.category]}</div>
-                  <p style={{ fontWeight: 600, fontSize: "0.875rem" }}>{item.name}</p>
-                  <p style={{ color: "var(--text3)", fontSize: "0.8rem", margin: "4px 0 10px" }}>₹{item.price}</p>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                    <button className="btn btn-outline btn-sm" onClick={() => removeFromCart(item._id)}>−</button>
-                    <span style={{ fontWeight: 600, minWidth: 20, textAlign: "center" }}>{cart[item._id]?.qty || 0}</span>
-                    <button className="btn btn-primary btn-sm" onClick={() => addToCart(item)}>+</button>
+                <div key={item._id} className="card" style={{ textAlign: "center", padding: "14px 10px" }}>
+                  <div style={{ fontSize: "1.8rem", marginBottom: 6 }}>
+                    {ITEM_EMOJI[item.name] || CATEGORY_ICON[item.category]}
+                  </div>
+                  <p style={{ fontWeight: 600, fontSize: "0.82rem", marginBottom: 2, lineHeight: 1.3 }}>{item.name}</p>
+                  <p style={{ color: "var(--text3)", fontSize: "0.78rem", margin: "4px 0 10px", fontFamily: "JetBrains Mono, monospace", fontWeight: 700 }}>₹{item.price}</p>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                    <button className="btn btn-outline btn-sm" style={{ padding: "3px 10px", fontSize: "1rem" }} onClick={() => removeFromCart(item._id)}>−</button>
+                    <span style={{ fontWeight: 700, minWidth: 22, textAlign: "center", fontFamily: "JetBrains Mono, monospace" }}>{cart[item._id]?.qty || 0}</span>
+                    <button className="btn btn-primary btn-sm" style={{ padding: "3px 10px", fontSize: "1rem" }} onClick={() => addToCart(item)}>+</button>
                   </div>
                 </div>
               ))}
+              {filteredMenu.length === 0 && (
+                <div className="empty" style={{ gridColumn: "1/-1" }}><div className="empty-icon">🍱</div><p>No items available for this meal</p></div>
+              )}
             </div>
           </div>
 
@@ -232,9 +258,10 @@ export default function Food({ user }) {
                   <div style={{ display: "grid", gap: 8 }}>
                     {items.map(item => (
                       <div key={item._id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, background: "var(--surface2)", opacity: item.available === false ? 0.5 : 1 }}>
+                        <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>{ITEM_EMOJI[item.name] || CATEGORY_ICON[item.category]}</span>
                         <div style={{ flex: 1 }}>
                           <p style={{ fontWeight: 600, fontSize: "0.875rem" }}>{item.name}</p>
-                          <p style={{ fontSize: "0.75rem", color: "var(--text3)" }}>₹{item.price}</p>
+                          <p style={{ fontSize: "0.75rem", color: "var(--text3)", fontFamily: "JetBrains Mono, monospace" }}>₹{item.price}</p>
                         </div>
                         <button
                           onClick={() => toggleAvailable(item)}

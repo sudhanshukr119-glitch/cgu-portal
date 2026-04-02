@@ -20,6 +20,7 @@ import Chat from "./Chat";
 import Users from "./Users";
 import Leaves from "./Leaves";
 import PremiumDashboard from "./PremiumDashboard";
+import IDCard from "./IDCard";
 
 const NAV_ALL = [
   { key: "home",          label: "Dashboard",       icon: "⬡",  section: "overview", roles: ["student","teacher","admin"] },
@@ -35,6 +36,7 @@ const NAV_ALL = [
   { key: "library",       label: "Library",         icon: "📚", section: "academic", roles: ["student","teacher","admin"] },
   { key: "faculty",       label: "Faculty",         icon: "👨🏫",section: "academic", roles: ["student","teacher","admin"] },
   { key: "fees",          label: "Fees & Finance",  icon: "💳", section: "finance",  roles: ["student","admin"] },
+  { key: "idcard",        label: "My ID Card",      icon: "🪧", section: "finance",  roles: ["student"] },
   { key: "hostel",        label: "Hostel",          icon: "🏠", section: "campus",   roles: ["student","admin"] },
   { key: "food",          label: "Canteen",         icon: "🍱", section: "campus",   roles: ["student","admin"] },
   { key: "dispensary",    label: "Medical",         icon: "🏥", section: "campus",   roles: ["student","admin"] },
@@ -55,6 +57,7 @@ const SECTIONS = [
 const PAGE_TITLES = {
   home: "Dashboard", notifications: "Announcements", chat: "Messages",
   users: "User Management", analytics: "Analytics", leaves: "Leave Requests",
+  idcard: "My ID Card",
   timetable: "Timetable", attendance: "Attendance", assignments: "Assignments",
   results: "Results & GPA", library: "Library", faculty: "Faculty Directory",
   fees: "Fees & Finance", hostel: "Hostel", food: "Canteen",
@@ -108,6 +111,7 @@ export default function Dashboard({ setPage }) {
       chat: <Chat {...props} />,
       users: <Users {...props} />,
       analytics: <PremiumDashboard {...props} />,
+      idcard: <IDCard {...props} />,
       leaves: <Leaves {...props} />,
     };
     return pages[active] || <Home {...props} />;
@@ -129,8 +133,8 @@ export default function Dashboard({ setPage }) {
           <div className="logo-mark">
             <div className="logo-icon">🎓</div>
             <div className="logo-text">
-              <h2>CGU Portal</h2>
-              <p>ERP System</p>
+              <h2>CGUCampusOne</h2>
+              <p>CGUCampusOne</p>
             </div>
           </div>
           {/* Role badge under logo */}
@@ -180,7 +184,7 @@ export default function Dashboard({ setPage }) {
           <div className="topbar-left">
             <button className="menu-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
             <div className="breadcrumb">
-              <span className="breadcrumb-item" style={{ cursor: "pointer" }} onClick={() => navigate("home")}>CGU Portal</span>
+              <span className="breadcrumb-item" style={{ cursor: "pointer" }} onClick={() => navigate("home")}>CGUCampusOne</span>
               {active !== "home" && (
                 <>
                   <span className="breadcrumb-sep">›</span>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import API from "../api";
 
 const CATALOG = [
@@ -21,7 +21,63 @@ export default function Library({ user }) {
   const [search, setSearch] = useState("");
   const [genre, setGenre] = useState("all");
 
-  useEffect(() => { API.get("/library").then(r => setRequests(r.data)).catch(() => {}); }, []);
+  // Digital Library state
+  const [running, setRunning]         = useState(false);
+  const [elapsed, setElapsed]         = useState(0);      // seconds this session
+  const [todayTotal, setTodayTotal]   = useState(0);      // seconds saved today
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [subject, setSubject]         = useState("");
+  const timerRef = useRef(null);
+  const saveRef  = useRef(null);
+
+  useEffect(() => {
+    API.get("/library").then(r => setRequests(r.data)).catch(() => {});
+    if (user.role === "student") {
+      API.get("/study/me").then(r => setTodayTotal(r.data.seconds || 0)).catch(() => {});
+    }
+    API.get("/study/leaderboard").then(r => setLeaderboard(r.data)).catch(() => {});
+  }, []);
+
+  // Timer tick
+  useEffect(() => {
+    if (running) {
+      timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
+      // Auto-save every 30 seconds
+      saveRef.current = setInterval(() => saveTime(30), 30000);
+    } else {
+      clearInterval(timerRef.current);
+      clearInterval(saveRef.current);
+    }
+    return () => { clearInterval(timerRef.current); clearInterval(saveRef.current); };
+  }, [running]);
+
+  const saveTime = async (secs) => {
+    if (secs <= 0) return;
+    try {
+      const res = await API.post("/study", { seconds: secs });
+      setTodayTotal(res.data.seconds || 0);
+      API.get("/study/leaderboard").then(r => setLeaderboard(r.data)).catch(() => {});
+    } catch {}
+  };
+
+  const startTimer  = () => { if (!running) setRunning(true); };
+  const pauseTimer  = () => { setRunning(false); };
+  const stopTimer   = async () => {
+    setRunning(false);
+    if (elapsed > 0) {
+      await saveTime(elapsed);
+      setElapsed(0);
+    }
+  };
+
+  const fmt = (s) => {
+    const h = Math.floor(s / 3600).toString().padStart(2, "0");
+    const m = Math.floor((s % 3600) / 60).toString().padStart(2, "0");
+    const sec = (s % 60).toString().padStart(2, "0");
+    return `${h}:${m}:${sec}`;
+  };
+
+  const medal = (i) => ["🥇", "🥈", "🥉"][i] || `#${i + 1}`;
 
   const requestBook = async (book) => {
     try {
@@ -70,6 +126,7 @@ export default function Library({ user }) {
           {user.role !== "student" && (
             <button className={`tab ${tab === "manage" ? "active" : ""}`} onClick={() => setTab("manage")}>Manage</button>
           )}
+          <button className={`tab ${tab === "digital" ? "active" : ""}`} onClick={() => setTab("digital")}>💻 Digital Library</button>
         </div>
       </div>
 
@@ -180,6 +237,154 @@ export default function Library({ user }) {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {tab === "digital" && (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
+
+          {/* ── TIMER PANEL ── */}
+          <div style={{ display: "grid", gap: 16 }}>
+
+            {/* Info banner */}
+            <div style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.25)", borderRadius: 12, padding: "10px 16px", fontSize: "0.8rem", color: "var(--text3)" }}>
+              📚 Start the timer when you begin studying. Your time is saved and counted in today's leaderboard.
+            </div>
+
+            {/* Timer card */}
+            <div className="card" style={{ textAlign: "center", padding: 32 }}>
+              <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>Current Session</p>
+
+              {/* Clock display */}
+              <div style={{
+                fontFamily: "JetBrains Mono, monospace", fontSize: "3.5rem", fontWeight: 800,
+                color: running ? "#10b981" : "var(--text)",
+                background: "var(--surface2)", borderRadius: 16, padding: "20px 32px",
+                display: "inline-block", marginBottom: 20,
+                boxShadow: running ? "0 0 30px rgba(16,185,129,0.2)" : "none",
+                transition: "all 0.3s",
+              }}>
+                {fmt(elapsed)}
+              </div>
+
+              {/* Subject input */}
+              {user.role === "student" && (
+                <div style={{ marginBottom: 16 }}>
+                  <input
+                    placeholder="What are you studying? (optional)"
+                    value={subject}
+                    onChange={e => setSubject(e.target.value)}
+                    disabled={running}
+                    style={{ width: "100%", padding: "8px 14px", borderRadius: 8, border: "1px solid var(--border2)", fontSize: "0.85rem", background: "var(--bg2)", textAlign: "center" }}
+                  />
+                </div>
+              )}
+
+              {/* Controls */}
+              {user.role === "student" ? (
+                <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+                  {!running ? (
+                    <button className="btn btn-success" onClick={startTimer} style={{ padding: "10px 28px", fontSize: "1rem" }}>
+                      ▶️ {elapsed > 0 ? "Resume" : "Start"}
+                    </button>
+                  ) : (
+                    <button className="btn btn-outline" onClick={pauseTimer} style={{ padding: "10px 28px", fontSize: "1rem" }}>
+                      ⏸️ Pause
+                    </button>
+                  )}
+                  <button className="btn btn-danger" onClick={stopTimer} disabled={elapsed === 0} style={{ padding: "10px 28px", fontSize: "1rem" }}>
+                    ⏹️ Stop & Save
+                  </button>
+                </div>
+              ) : (
+                <p style={{ color: "var(--text3)", fontSize: "0.85rem" }}>Login as student to use the timer</p>
+              )}
+            </div>
+
+            {/* Today's total */}
+            {user.role === "student" && (
+              <div className="card" style={{ display: "flex", alignItems: "center", gap: 16, padding: 20 }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>
+                  📚
+                </div>
+                <div>
+                  <p style={{ fontSize: "0.75rem", color: "var(--text3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>Today's Total Study Time</p>
+                  <p style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "1.8rem", fontWeight: 800, color: "var(--primary-light)", lineHeight: 1.2 }}>
+                    {fmt(todayTotal + elapsed)}
+                  </p>
+                  <p style={{ fontSize: "0.72rem", color: "var(--text3)", marginTop: 2 }}>Saved: {fmt(todayTotal)} + Current: {fmt(elapsed)}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── LEADERBOARD ── */}
+          <div className="card">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <p style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text)" }}>🏆 Today's Leaderboard</p>
+              <span style={{ fontSize: "0.72rem", color: "var(--text3)" }}>{new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short" })}</span>
+            </div>
+
+            {leaderboard.length === 0 ? (
+              <div className="empty"><div className="empty-icon">🏆</div><p>No study sessions today yet. Be the first!</p></div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {leaderboard.map((s, i) => {
+                  const isMe = s.studentId === user._id || s.studentId === user.id;
+                  const pct  = leaderboard[0]?.seconds ? Math.round((s.seconds / leaderboard[0].seconds) * 100) : 0;
+                  return (
+                    <div key={s._id} style={{
+                      display: "flex", alignItems: "center", gap: 12, padding: "12px 14px",
+                      borderRadius: 12, border: `1px solid ${isMe ? "rgba(99,102,241,0.4)" : "var(--border)"}`,
+                      background: isMe ? "rgba(99,102,241,0.06)" : "var(--surface2)",
+                    }}>
+                      {/* Rank */}
+                      <span style={{ fontSize: i < 3 ? "1.4rem" : "0.85rem", fontWeight: 700, minWidth: 32, textAlign: "center", color: "var(--text3)" }}>
+                        {medal(i)}
+                      </span>
+
+                      {/* Avatar */}
+                      <div style={{
+                        width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                        background: i === 0 ? "linear-gradient(135deg, #f59e0b, #ef4444)"
+                                  : i === 1 ? "linear-gradient(135deg, #9ca3af, #6b7280)"
+                                  : i === 2 ? "linear-gradient(135deg, #d97706, #b45309)"
+                                  : "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "#fff", fontWeight: 700, fontSize: "0.8rem",
+                      }}>
+                        {s.studentName?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+                      </div>
+
+                      {/* Name + bar */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                          <span style={{ fontWeight: isMe ? 700 : 600, fontSize: "0.85rem", color: isMe ? "var(--primary-light)" : "var(--text)" }}>
+                            {s.studentName} {isMe ? "(You)" : ""}
+                          </span>
+                          <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: "0.82rem", fontWeight: 700, color: "var(--text)" }}>
+                            {fmt(s.seconds)}
+                          </span>
+                        </div>
+                        <div style={{ height: 6, borderRadius: 999, background: "var(--border)", overflow: "hidden" }}>
+                          <div style={{
+                            height: "100%", borderRadius: 999, width: `${pct}%`,
+                            background: i === 0 ? "#f59e0b" : i === 1 ? "#9ca3af" : i === 2 ? "#d97706" : "#6366f1",
+                            transition: "width 0.5s ease",
+                          }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <button className="btn btn-outline btn-sm" style={{ marginTop: 14, width: "100%" }}
+              onClick={() => API.get("/study/leaderboard").then(r => setLeaderboard(r.data)).catch(() => {})}>
+              🔄 Refresh Leaderboard
+            </button>
           </div>
         </div>
       )}

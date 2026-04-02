@@ -8,11 +8,14 @@ const signToken = (user) =>
 
 exports.register = async (req, res) => {
   try {
+    // Block admin self-registration — admin accounts can only be created by existing admins
+    if (req.body.role === "admin")
+      return res.status(403).json({ message: "Admin accounts cannot be self-registered. Contact your system administrator." });
+
     const exists = await User.findOne({ email: req.body.email });
     if (exists) return res.status(409).json({ message: "Email already registered" });
     const hashed = await bcrypt.hash(req.body.password, 12);
     const user = new User({ ...req.body, password: hashed });
-    // Trigger pre-save to assign permissions
     await user.save();
     res.status(201).json({ message: "User created", user: user.toSafeObject() });
   } catch (err) {

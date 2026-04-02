@@ -9,13 +9,13 @@ exports.getResults = async (req, res) => {
       filter.isPublished = true;
     } else {
       if (req.query.studentId) filter.student = req.query.studentId;
-      if (req.query.class) filter.class = req.query.class;
-      if (req.query.subject) filter.subject = req.query.subject;
+      if (req.query.class)     filter.class   = req.query.class;
+      if (req.query.subject)   filter.subject = req.query.subject;
     }
     if (req.query.semester) filter.semester = Number(req.query.semester);
     if (req.query.examType) filter.examType = req.query.examType;
 
-    const results = await Result.find(filter).sort({ createdAt: -1 });
+    const results = await Result.find(filter).sort({ semester: 1, createdAt: -1 });
     res.json(results);
   } catch (err) {
     res.status(500).json({ message: err.message });

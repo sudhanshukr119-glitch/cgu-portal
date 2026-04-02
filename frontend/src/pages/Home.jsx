@@ -2,13 +2,94 @@ import { useEffect, useState } from "react";
 import API from "../api";
 import Calendar from "../components/Calendar";
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { calcSGPA, groupBySemester } from "../utils/gpa";
+import { calcSGPA, calcCGPA, groupBySemester } from "../utils/gpa";
 
 const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#3b82f6"];
 
 const Skeleton = ({ h = 20, w = "100%", r = 8 }) => (
   <div style={{ height: h, width: w, borderRadius: r, background: "var(--surface2)", animation: "pulse 1.5s infinite" }} />
 );
+
+/* ─── EXAM COUNTDOWN WIDGET ─── */
+function ExamCountdown() {
+  const [exams, setExams] = useState([]);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    API.get("/events").then(r => {
+      const upcoming = r.data
+        .filter(e => e.category === "exam" && new Date(e.date) > new Date())
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(0, 3);
+      setExams(upcoming);
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  const getCountdown = (date) => {
+    const diff = new Date(date) - now;
+    if (diff <= 0) return { d: 0, h: 0, m: 0, s: 0, done: true };
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return { d, h, m, s, done: false };
+  };
+
+  if (!exams.length) return null;
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <p className="chart-title" style={{ marginBottom: 14 }}>Upcoming Exam Countdown</p>
+      <div style={{ display: "grid", gap: 12 }}>
+        {exams.map(exam => {
+          const { d, h, m, s, done } = getCountdown(exam.date);
+          const urgent = d === 0;
+          return (
+            <div key={exam._id} style={{
+              display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
+              padding: "12px 16px", borderRadius: 12,
+              background: urgent ? "rgba(239,68,68,0.06)" : "var(--surface2)",
+              border: `1px solid ${urgent ? "rgba(239,68,68,0.25)" : "var(--border)"}`,
+            }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--text)", marginBottom: 2 }}>{exam.title}</p>
+                <div style={{ display: "flex", gap: 10, fontSize: "0.72rem", color: "var(--text3)", flexWrap: "wrap" }}>
+                  {exam.venue && <span>{exam.venue}</span>}
+                  <span>{new Date(exam.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+                  {exam.time && <span>{exam.time}</span>}
+                </div>
+              </div>
+              {done ? (
+                <span className="badge badge-success">Exam Day!</span>
+              ) : (
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  {[[d, "Days"], [h, "Hrs"], [m, "Min"], [s, "Sec"]].map(([val, label]) => (
+                    <div key={label} style={{
+                      textAlign: "center", minWidth: 44,
+                      background: urgent ? "rgba(239,68,68,0.1)" : "var(--surface)",
+                      border: `1px solid ${urgent ? "rgba(239,68,68,0.3)" : "var(--border)"}`,
+                      borderRadius: 8, padding: "6px 8px",
+                    }}>
+                      <p style={{ fontFamily: "JetBrains Mono, monospace", fontWeight: 800, fontSize: "1.1rem", color: urgent ? "#ef4444" : "var(--primary-light)", lineHeight: 1 }}>
+                        {String(val).padStart(2, "0")}
+                      </p>
+                      <p style={{ fontSize: "0.6rem", color: "var(--text3)", marginTop: 2, fontWeight: 600 }}>{label}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 /* ─── ADMIN DASHBOARD ─── */
 function AdminDashboard({ setActive }) {
@@ -338,7 +419,7 @@ function StudentDashboard({ user, setActive }) {
       setEvents(e.data.filter(x => new Date(x.date) >= new Date()).slice(0, 3));
       const semesters = groupBySemester(res.data);
       setSemData(semesters.map(s => ({ sem: `S${s.sem}`, sgpa: parseFloat(calcSGPA(s.items)) })));
-      setCgpa(calcSGPA(res.data));
+      setCgpa(calcCGPA(res.data));
       setLoading(false);
     });
   }, []);
@@ -453,6 +534,8 @@ function StudentDashboard({ user, setActive }) {
           ))}
         </div>
       </div>
+
+      <ExamCountdown />
 
       <Calendar events={events} assignments={[]} />
     </div>

@@ -50,7 +50,7 @@ export default function Signup({ setPage }) {
             Create Account
           </h1>
           <p style={{ color: "var(--text3)", fontSize: "0.875rem", marginTop: 6 }}>
-            Join the Campus ERP Portal
+            Join CGUCampusOne
           </p>
         </div>
 
@@ -95,7 +95,6 @@ export default function Signup({ setPage }) {
                 value={form.role} onChange={set("role")}>
                 <option value="student">Student</option>
                 <option value="teacher">Teacher</option>
-                <option value="admin">Admin</option>
               </select>
             </div>
           </div>

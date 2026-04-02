@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
   email:    { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
   role:     { type: String, enum: ["admin", "teacher", "student"], required: true },
-  avatar:   { type: String, default: "" },
+  avatar: { type: String, default: "" },  // base64 or URL photo
   phone:    { type: String, default: "" },
   gender:   { type: String, enum: ["male", "female", "other", ""] , default: "" },
   address:  { type: String, default: "" },

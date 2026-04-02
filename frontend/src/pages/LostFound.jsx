@@ -86,6 +86,9 @@ export default function LostFound({ user }) {
               <div style={{ textAlign: "right" }}>
                 <span style={{ fontSize: "0.72rem", color: "var(--text3)", display: "block" }}>{new Date(p.createdAt).toLocaleDateString()}</span>
                 {p.resolvedAt && <span style={{ fontSize: "0.68rem", color: "#10b981", display: "block", marginTop: 2 }}>Recovered {new Date(p.resolvedAt).toLocaleDateString()}</span>}
+                {(p.userId === user._id || p.userId === user.id) && (
+                  <span style={{ fontSize: "0.65rem", fontWeight: 700, background: "rgba(99,102,241,0.12)", color: "#818cf8", borderRadius: 6, padding: "1px 6px", display: "inline-block", marginTop: 4 }}>My Post</span>
+                )}
               </div>
             </div>
 
@@ -100,11 +103,19 @@ export default function LostFound({ user }) {
 
             {p.status === "open" && (
               <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-                <button className="btn btn-success btn-sm" onClick={() => resolve(p._id)}>
-                  {p.type === "lost" ? "✅ Mark as Found" : "✅ Mark Resolved"}
-                </button>
+                {/* Only owner or admin can mark as found */}
+                {(p.userId === user._id || p.userId === user.id || user.role === "admin") && (
+                  <button className="btn btn-success btn-sm" onClick={() => resolve(p._id)}>
+                    {p.type === "lost" ? "✅ Mark as Found" : "✅ Mark Resolved"}
+                  </button>
+                )}
+                {/* Only owner or admin can delete */}
                 {(p.userId === user._id || p.userId === user.id || user.role === "admin") && (
                   <button className="btn btn-danger btn-sm" onClick={() => remove(p._id)}>Delete</button>
+                )}
+                {/* Other users see a read-only label */}
+                {p.userId !== user._id && p.userId !== user.id && user.role !== "admin" && (
+                  <span style={{ fontSize: "0.75rem", color: "var(--text3)", alignSelf: "center" }}>Only the owner can resolve this</span>
                 )}
               </div>
             )}

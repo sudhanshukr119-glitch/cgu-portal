@@ -22,7 +22,7 @@ export default function Attendance({ user }) {
   useEffect(() => {
     API.get("/attendance").then(r => { setRecords(r.data); setLoading(false); }).catch(() => setLoading(false));
     if (user.role === "teacher" || user.role === "admin") {
-      API.get("/users?role=student&limit=100").then(r => setStudents(r.data.users || [])).catch(() => {});
+      API.get("/users?role=student&limit=500").then(r => setStudents(r.data.users || [])).catch(() => {});
     }
     if (user.role === "student") {
       API.get("/attendance/self").then(r => setSelfRecords(r.data)).catch(() => {});
@@ -270,8 +270,8 @@ export default function Attendance({ user }) {
               <div className="form-group">
                 <label>Student</label>
                 <select required onChange={e => setMarkForm({ ...markForm, studentId: e.target.value })}>
-                  <option value="">Select student</option>
-                  {students.map(s => <option key={s._id} value={s._id}>{s.name} ({s.rollNo || s.class})</option>)}
+                  <option value="">{students.length === 0 ? "Loading students..." : `Select student (${students.length})`}</option>
+                  {students.map(s => <option key={s._id} value={s._id}>{s.name} {s.rollNo ? `— ${s.rollNo}` : ""} {s.class ? `(${s.class})` : ""}</option>)}
                 </select>
               </div>
               <div className="form-group">

@@ -4,10 +4,11 @@ const feeSchema = new mongoose.Schema({
   studentId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   studentName: String,
   amount: Number,
-  type: { type: String, enum: ["tuition", "hostel", "exam", "other"] },
+  type: { type: String, enum: ["tuition", "hostel", "exam", "library", "transport", "other"] },
   status: { type: String, enum: ["paid", "pending", "overdue"], default: "pending" },
   dueDate: Date,
   paidDate: Date,
+  paymentId: String,
   semester: String,
 }, { timestamps: true });
 

@@ -75,6 +75,19 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+// Student/user: update own avatar photo
+exports.updateAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    if (!avatar) return res.status(400).json({ message: "No avatar provided" });
+    // Limit base64 size to ~2MB
+    if (avatar.length > 2 * 1024 * 1024 * 1.37)
+      return res.status(400).json({ message: "Image too large. Max 2MB." });
+    const user = await User.findByIdAndUpdate(req.user.id, { avatar }, { new: true }).select("-password");
+    res.json({ avatar: user.avatar });
+  } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
 // Get faculty list (accessible to all authenticated users)
 exports.getFaculty = async (req, res) => {
   try {
