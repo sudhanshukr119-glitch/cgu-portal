@@ -10,10 +10,15 @@ const connectDB = require("./config/db");
 const app    = express();
 const server = http.createServer(app);
 
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "http://localhost:3000").split(",");
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "http://localhost:3000")
+  .split(",").map(o => o.trim());
 
 const io = new Server(server, {
-  cors: { origin: ALLOWED_ORIGINS, methods: ["GET","POST","PUT","DELETE"] }
+  cors: {
+    origin: ALLOWED_ORIGINS,
+    methods: ["GET","POST","PUT","DELETE"],
+    credentials: true,
+  }
 });
 
 // Security headers
