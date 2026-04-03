@@ -1,25 +1,176 @@
 import { useEffect, useState, useRef } from "react";
 import API from "../api";
 
+// branch = engineering branch | genre = subject/topic
 const CATALOG = [
-  { title: "Introduction to Algorithms", author: "Cormen et al.", isbn: "978-0262033848", genre: "CS" },
-  { title: "Clean Code", author: "Robert C. Martin", isbn: "978-0132350884", genre: "CS" },
-  { title: "The Pragmatic Programmer", author: "Hunt & Thomas", isbn: "978-0135957059", genre: "CS" },
-  { title: "Engineering Mathematics", author: "B.S. Grewal", isbn: "978-8174091955", genre: "Math" },
-  { title: "Physics for Scientists", author: "Serway & Jewett", isbn: "978-1133947271", genre: "Physics" },
-  { title: "Organic Chemistry", author: "Morrison & Boyd", isbn: "978-8177583977", genre: "Chemistry" },
-  { title: "Data Structures in C", author: "Tanenbaum", isbn: "978-0131997462", genre: "CS" },
-  { title: "Operating System Concepts", author: "Silberschatz", isbn: "978-1118063330", genre: "CS" },
-  { title: "Database System Concepts", author: "Korth & Sudarshan", isbn: "978-0073523323", genre: "CS" },
-  { title: "Computer Networks", author: "Andrew Tanenbaum", isbn: "978-0132126953", genre: "CS" },
+  // ── COMMON (All Branches) ────────────────────────────────────────────────
+  { title: "Engineering Mathematics Vol. 1", author: "B.S. Grewal", isbn: "978-8174091955", branch: "Common", genre: "Mathematics" },
+  { title: "Engineering Mathematics Vol. 2", author: "B.S. Grewal", isbn: "978-8174091956", branch: "Common", genre: "Mathematics" },
+  { title: "Higher Engineering Mathematics", author: "H.K. Dass", isbn: "978-8121903455", branch: "Common", genre: "Mathematics" },
+  { title: "Engineering Physics", author: "R.K. Gaur & S.L. Gupta", isbn: "978-8171960774", branch: "Common", genre: "Physics" },
+  { title: "A Textbook of Engineering Chemistry", author: "S.S. Dara", isbn: "978-8121903929", branch: "Common", genre: "Chemistry" },
+  { title: "Engineering Drawing", author: "N.D. Bhatt", isbn: "978-9385039140", branch: "Common", genre: "Drawing" },
+  { title: "Fundamentals of Electrical Engineering", author: "Rajendra Prasad", isbn: "978-8120348677", branch: "Common", genre: "Electrical" },
+  { title: "Basic Electronics", author: "D.P. Kothari & I.J. Nagrath", isbn: "978-0070669116", branch: "Common", genre: "Electronics" },
+  { title: "Communication Skills for Engineers", author: "Sunita Mishra", isbn: "978-8131733264", branch: "Common", genre: "Soft Skills" },
+  { title: "Environmental Science", author: "N.N. Basak", isbn: "978-0070669117", branch: "Common", genre: "Environment" },
+
+  // ── COMPUTER SCIENCE & ENGINEERING (CSE) ────────────────────────────────
+  { title: "Introduction to Algorithms (CLRS)", author: "Cormen, Leiserson, Rivest & Stein", isbn: "978-0262033848", branch: "CSE", genre: "Algorithms" },
+  { title: "Data Structures Using C", author: "Reema Thareja", isbn: "978-0198099307", branch: "CSE", genre: "Data Structures" },
+  { title: "Data Structures and Algorithms in C", author: "A.K. Tanenbaum", isbn: "978-0131997462", branch: "CSE", genre: "Data Structures" },
+  { title: "Operating System Concepts", author: "Silberschatz, Galvin & Gagne", isbn: "978-1118063330", branch: "CSE", genre: "Operating Systems" },
+  { title: "Modern Operating Systems", author: "Andrew S. Tanenbaum", isbn: "978-0136006633", branch: "CSE", genre: "Operating Systems" },
+  { title: "Database System Concepts", author: "Korth, Silberschatz & Sudarshan", isbn: "978-0073523323", branch: "CSE", genre: "Databases" },
+  { title: "Computer Networks", author: "Andrew S. Tanenbaum", isbn: "978-0132126953", branch: "CSE", genre: "Networks" },
+  { title: "Computer Networking: A Top-Down Approach", author: "Kurose & Ross", isbn: "978-0136079675", branch: "CSE", genre: "Networks" },
+  { title: "Clean Code", author: "Robert C. Martin", isbn: "978-0132350884", branch: "CSE", genre: "Software Engineering" },
+  { title: "Software Engineering", author: "Roger S. Pressman", isbn: "978-0078022128", branch: "CSE", genre: "Software Engineering" },
+  { title: "Compiler Design (Dragon Book)", author: "Alfred V. Aho et al.", isbn: "978-0321486813", branch: "CSE", genre: "Compiler Design" },
+  { title: "Computer Organization and Architecture", author: "William Stallings", isbn: "978-0134101613", branch: "CSE", genre: "Computer Architecture" },
+  { title: "Digital Design", author: "M. Morris Mano", isbn: "978-0132774208", branch: "CSE", genre: "Digital Logic" },
+  { title: "Discrete Mathematics and Its Applications", author: "Kenneth H. Rosen", isbn: "978-0073383095", branch: "CSE", genre: "Discrete Math" },
+  { title: "Theory of Computation", author: "Michael Sipser", isbn: "978-1133187790", branch: "CSE", genre: "Theory of Computation" },
+  { title: "Artificial Intelligence: A Modern Approach", author: "Russell & Norvig", isbn: "978-0136042594", branch: "CSE", genre: "AI & ML" },
+  { title: "Deep Learning", author: "Goodfellow, Bengio & Courville", isbn: "978-0262035613", branch: "CSE", genre: "AI & ML" },
+  { title: "Pattern Recognition and Machine Learning", author: "Christopher Bishop", isbn: "978-0387310732", branch: "CSE", genre: "AI & ML" },
+  { title: "Cryptography and Network Security", author: "William Stallings", isbn: "978-0134444284", branch: "CSE", genre: "Security" },
+  { title: "Computer Graphics: Principles and Practice", author: "Foley, van Dam et al.", isbn: "978-0201848403", branch: "CSE", genre: "Graphics" },
+
+  // ── INFORMATION TECHNOLOGY (IT) ──────────────────────────────────────────
+  { title: "Web Technologies", author: "A. Radha Krishna Rao", isbn: "978-8173716386", branch: "IT", genre: "Web Development" },
+  { title: "JavaScript: The Good Parts", author: "Douglas Crockford", isbn: "978-0596517748", branch: "IT", genre: "Web Development" },
+  { title: "Learning Python", author: "Mark Lutz", isbn: "978-1449355739", branch: "IT", genre: "Programming" },
+  { title: "Java: The Complete Reference", author: "Herbert Schildt", isbn: "978-1260440232", branch: "IT", genre: "Programming" },
+  { title: "Cloud Computing: Concepts, Technology & Architecture", author: "Thomas Erl", isbn: "978-0133387520", branch: "IT", genre: "Cloud Computing" },
+  { title: "Big Data: A Revolution", author: "Viktor Mayer-Schonberger", isbn: "978-0544002692", branch: "IT", genre: "Big Data" },
+  { title: "Information Security: Principles and Practice", author: "Mark Stamp", isbn: "978-1119505907", branch: "IT", genre: "Security" },
+  { title: "System Analysis and Design", author: "Elias M. Awad", isbn: "978-8120320857", branch: "IT", genre: "Systems" },
+  { title: "Human Computer Interaction", author: "Alan Dix et al.", isbn: "978-0130461094", branch: "IT", genre: "HCI" },
+  { title: "Software Project Management", author: "Bob Hughes & Mike Cotterell", isbn: "978-0077122799", branch: "IT", genre: "Project Management" },
+
+  // ── ELECTRONICS & COMMUNICATION ENGINEERING (ECE) ───────────────────────
+  { title: "Electronic Devices and Circuit Theory", author: "Robert Boylestad", isbn: "978-0132622264", branch: "ECE", genre: "Analog Electronics" },
+  { title: "Microelectronics Circuits", author: "Sedra & Smith", isbn: "978-0199339136", branch: "ECE", genre: "Analog Electronics" },
+  { title: "Digital Electronics", author: "R.P. Jain", isbn: "978-0070669115", branch: "ECE", genre: "Digital Electronics" },
+  { title: "Signals and Systems", author: "Oppenheim & Willsky", isbn: "978-0138147570", branch: "ECE", genre: "Signals & Systems" },
+  { title: "Communication Systems", author: "Simon Haykin", isbn: "978-0471178699", branch: "ECE", genre: "Communications" },
+  { title: "Principles of Communication Systems", author: "Taub & Schilling", isbn: "978-0070669118", branch: "ECE", genre: "Communications" },
+  { title: "Electromagnetic Field Theory", author: "Matthew Sadiku", isbn: "978-0073380667", branch: "ECE", genre: "Electromagnetics" },
+  { title: "Antenna Theory: Analysis and Design", author: "Constantine Balanis", isbn: "978-1118642061", branch: "ECE", genre: "Antennas" },
+  { title: "VLSI Design", author: "Weste & Harris", isbn: "978-0321547996", branch: "ECE", genre: "VLSI" },
+  { title: "Microprocessors and Microcontrollers", author: "N. Senthil Kumar", isbn: "978-0198065449", branch: "ECE", genre: "Microprocessors" },
+  { title: "Control Systems Engineering", author: "Norman S. Nise", isbn: "978-1118170519", branch: "ECE", genre: "Control Systems" },
+  { title: "Digital Signal Processing", author: "Proakis & Manolakis", isbn: "978-0131873742", branch: "ECE", genre: "DSP" },
+  { title: "Wireless Communications", author: "Andrea Goldsmith", isbn: "978-0521837163", branch: "ECE", genre: "Wireless" },
+  { title: "Optical Fiber Communications", author: "John M. Senior", isbn: "978-0130326812", branch: "ECE", genre: "Optical Comm" },
+
+  // ── ELECTRICAL ENGINEERING (EE) ──────────────────────────────────────────
+  { title: "Electrical Machines", author: "I.J. Nagrath & D.P. Kothari", isbn: "978-0070669119", branch: "EE", genre: "Electrical Machines" },
+  { title: "Power Systems Engineering", author: "Nagrath & Kothari", isbn: "978-0070669120", branch: "EE", genre: "Power Systems" },
+  { title: "Power Electronics", author: "M.H. Rashid", isbn: "978-0133125900", branch: "EE", genre: "Power Electronics" },
+  { title: "Electrical Circuit Analysis", author: "A. Chakrabarti", isbn: "978-8177000010", branch: "EE", genre: "Circuit Analysis" },
+  { title: "Control Systems", author: "A. Nagoor Kani", isbn: "978-9380578781", branch: "EE", genre: "Control Systems" },
+  { title: "Electromagnetic Theory", author: "W.H. Hayt", isbn: "978-0073380668", branch: "EE", genre: "Electromagnetics" },
+  { title: "Switchgear and Protection", author: "Sunil S. Rao", isbn: "978-8177000011", branch: "EE", genre: "Protection" },
+  { title: "High Voltage Engineering", author: "M.S. Naidu & V. Kamaraju", isbn: "978-0070669121", branch: "EE", genre: "High Voltage" },
+  { title: "Utilization of Electrical Energy", author: "J.B. Gupta", isbn: "978-8177000012", branch: "EE", genre: "Utilization" },
+  { title: "Renewable Energy Sources", author: "G.D. Rai", isbn: "978-8177000013", branch: "EE", genre: "Renewable Energy" },
+
+  // ── MECHANICAL ENGINEERING (ME) ──────────────────────────────────────────
+  { title: "Engineering Mechanics", author: "R.C. Hibbeler", isbn: "978-0133918922", branch: "ME", genre: "Mechanics" },
+  { title: "Strength of Materials", author: "R.K. Bansal", isbn: "978-8180141416", branch: "ME", genre: "Strength of Materials" },
+  { title: "Theory of Machines", author: "S.S. Rattan", isbn: "978-0070669122", branch: "ME", genre: "Theory of Machines" },
+  { title: "Machine Design", author: "V.B. Bhandari", isbn: "978-0070669123", branch: "ME", genre: "Machine Design" },
+  { title: "Thermodynamics: An Engineering Approach", author: "Cengel & Boles", isbn: "978-0073398174", branch: "ME", genre: "Thermodynamics" },
+  { title: "Fluid Mechanics and Hydraulic Machines", author: "R.K. Bansal", isbn: "978-8180141447", branch: "ME", genre: "Fluid Mechanics" },
+  { title: "Heat and Mass Transfer", author: "R.K. Rajput", isbn: "978-8121924122", branch: "ME", genre: "Heat Transfer" },
+  { title: "Manufacturing Engineering and Technology", author: "Kalpakjian & Schmid", isbn: "978-0133128741", branch: "ME", genre: "Manufacturing" },
+  { title: "Metrology and Quality Control", author: "R.K. Jain", isbn: "978-8174091957", branch: "ME", genre: "Metrology" },
+  { title: "Refrigeration and Air Conditioning", author: "C.P. Arora", isbn: "978-0070669124", branch: "ME", genre: "HVAC" },
+  { title: "Automobile Engineering", author: "Kirpal Singh", isbn: "978-8174091958", branch: "ME", genre: "Automobile" },
+  { title: "Finite Element Methods", author: "P. Seshu", isbn: "978-8120323155", branch: "ME", genre: "FEM" },
+
+  // ── CIVIL ENGINEERING (CE) ───────────────────────────────────────────────
+  { title: "Structural Analysis", author: "R.C. Hibbeler", isbn: "978-0134610672", branch: "Civil", genre: "Structural Analysis" },
+  { title: "Reinforced Concrete Design", author: "Pillai & Menon", isbn: "978-0070669125", branch: "Civil", genre: "RCC Design" },
+  { title: "Steel Structures Design", author: "L.S. Negi", isbn: "978-0070669126", branch: "Civil", genre: "Steel Design" },
+  { title: "Soil Mechanics and Foundation Engineering", author: "K.R. Arora", isbn: "978-8180141461", branch: "Civil", genre: "Geotechnical" },
+  { title: "Fluid Mechanics", author: "Modi & Seth", isbn: "978-8174091959", branch: "Civil", genre: "Fluid Mechanics" },
+  { title: "Surveying Vol. 1", author: "B.C. Punmia", isbn: "978-8131807286", branch: "Civil", genre: "Surveying" },
+  { title: "Surveying Vol. 2", author: "B.C. Punmia", isbn: "978-8131807287", branch: "Civil", genre: "Surveying" },
+  { title: "Transportation Engineering", author: "C.E.G. Justo & S.K. Khanna", isbn: "978-8174091960", branch: "Civil", genre: "Transportation" },
+  { title: "Environmental Engineering", author: "B.C. Punmia", isbn: "978-8131807288", branch: "Civil", genre: "Environmental Engg" },
+  { title: "Irrigation Engineering", author: "R.K. Sharma & T.K. Sharma", isbn: "978-8174091961", branch: "Civil", genre: "Irrigation" },
+  { title: "Concrete Technology", author: "M.S. Shetty", isbn: "978-8121900034", branch: "Civil", genre: "Concrete Tech" },
+  { title: "Building Materials and Construction", author: "P.C. Varghese", isbn: "978-8120321540", branch: "Civil", genre: "Construction" },
+
+  // ── CHEMICAL ENGINEERING (ChE) ───────────────────────────────────────────
+  { title: "Chemical Engineering Vol. 1", author: "Coulson & Richardson", isbn: "978-0750644440", branch: "Chemical", genre: "Chemical Engg" },
+  { title: "Chemical Engineering Vol. 2", author: "Coulson & Richardson", isbn: "978-0750644457", branch: "Chemical", genre: "Chemical Engg" },
+  { title: "Mass Transfer Operations", author: "Robert E. Treybal", isbn: "978-0070669127", branch: "Chemical", genre: "Mass Transfer" },
+  { title: "Chemical Reaction Engineering", author: "Octave Levenspiel", isbn: "978-0471254249", branch: "Chemical", genre: "Reaction Engg" },
+  { title: "Process Dynamics and Control", author: "Seborg, Edgar & Mellichamp", isbn: "978-0470128671", branch: "Chemical", genre: "Process Control" },
+  { title: "Introduction to Chemical Engineering Thermodynamics", author: "Smith, Van Ness & Abbott", isbn: "978-0073104454", branch: "Chemical", genre: "Thermodynamics" },
+  { title: "Unit Operations of Chemical Engineering", author: "McCabe, Smith & Harriott", isbn: "978-0073104455", branch: "Chemical", genre: "Unit Operations" },
+  { title: "Organic Chemistry", author: "Morrison & Boyd", isbn: "978-8177583977", branch: "Chemical", genre: "Chemistry" },
+  { title: "Physical Chemistry", author: "P.W. Atkins", isbn: "978-0198769866", branch: "Chemical", genre: "Chemistry" },
+  { title: "Heat Transfer", author: "J.P. Holman", isbn: "978-0073529363", branch: "Chemical", genre: "Heat Transfer" },
+
+  // ── INFORMATION SCIENCE & ENGINEERING (ISE) ──────────────────────────────
+  { title: "Computer Organization", author: "Carl Hamacher", isbn: "978-0070669128", branch: "ISE", genre: "Computer Org" },
+  { title: "Principles of Programming Languages", author: "Robert W. Sebesta", isbn: "978-0133943023", branch: "ISE", genre: "Programming Languages" },
+  { title: "Software Testing", author: "Ron Patton", isbn: "978-0672327988", branch: "ISE", genre: "Testing" },
+  { title: "Object Oriented Analysis and Design", author: "Grady Booch", isbn: "978-0805353402", branch: "ISE", genre: "OOAD" },
+  { title: "Design Patterns", author: "Gang of Four", isbn: "978-0201633610", branch: "ISE", genre: "Design Patterns" },
+  { title: "Unix and Shell Programming", author: "B.A. Forouzan", isbn: "978-0070669129", branch: "ISE", genre: "Unix/Linux" },
+  { title: "Data Warehousing and Data Mining", author: "Alex Berson", isbn: "978-0070669130", branch: "ISE", genre: "Data Mining" },
+  { title: "Mobile Computing", author: "Raj Kamal", isbn: "978-0070669131", branch: "ISE", genre: "Mobile Computing" },
+  { title: "Internet of Things", author: "Arshdeep Bahga", isbn: "978-0996025515", branch: "ISE", genre: "IoT" },
+  { title: "Cyber Security Essentials", author: "James Graham", isbn: "978-1439851234", branch: "ISE", genre: "Cyber Security" },
+
+  // ── AEROSPACE ENGINEERING (AE) ───────────────────────────────────────────
+  { title: "Introduction to Flight", author: "John D. Anderson", isbn: "978-0078027673", branch: "Aerospace", genre: "Aerodynamics" },
+  { title: "Aerodynamics for Engineers", author: "Bertin & Cummings", isbn: "978-0132832885", branch: "Aerospace", genre: "Aerodynamics" },
+  { title: "Aircraft Structures for Engineering Students", author: "T.H.G. Megson", isbn: "978-0080969053", branch: "Aerospace", genre: "Structures" },
+  { title: "Rocket Propulsion Elements", author: "Sutton & Biblarz", isbn: "978-0470080245", branch: "Aerospace", genre: "Propulsion" },
+  { title: "Orbital Mechanics for Engineering Students", author: "Howard D. Curtis", isbn: "978-0080977478", branch: "Aerospace", genre: "Orbital Mechanics" },
+  { title: "Aircraft Performance and Design", author: "John D. Anderson", isbn: "978-0070019713", branch: "Aerospace", genre: "Aircraft Design" },
+  { title: "Gas Dynamics", author: "E. Rathakrishnan", isbn: "978-8120346604", branch: "Aerospace", genre: "Gas Dynamics" },
+  { title: "Avionics Navigation Systems", author: "Myron Kayton", isbn: "978-0471547952", branch: "Aerospace", genre: "Avionics" },
+
+  // ── BIOTECHNOLOGY (BT) ───────────────────────────────────────────────────
+  { title: "Molecular Biology of the Cell", author: "Alberts et al.", isbn: "978-0393884821", branch: "Biotech", genre: "Molecular Biology" },
+  { title: "Biochemistry", author: "Lehninger, Nelson & Cox", isbn: "978-1319114657", branch: "Biotech", genre: "Biochemistry" },
+  { title: "Microbiology", author: "Prescott, Harley & Klein", isbn: "978-0073375298", branch: "Biotech", genre: "Microbiology" },
+  { title: "Principles of Genetics", author: "Snustad & Simmons", isbn: "978-0470903599", branch: "Biotech", genre: "Genetics" },
+  { title: "Bioprocess Engineering", author: "Shuler & Kargi", isbn: "978-0130819086", branch: "Biotech", genre: "Bioprocess" },
+  { title: "Bioinformatics", author: "David W. Mount", isbn: "978-0879697129", branch: "Biotech", genre: "Bioinformatics" },
+  { title: "Immunology", author: "Kuby", isbn: "978-1464189784", branch: "Biotech", genre: "Immunology" },
+  { title: "Genetic Engineering", author: "S.B. Primrose", isbn: "978-1405135443", branch: "Biotech", genre: "Genetic Engg" },
 ];
+
+const BRANCH_COLORS = {
+  Common:   "linear-gradient(135deg,#6366f1,#8b5cf6)",
+  CSE:      "linear-gradient(135deg,#0ea5e9,#6366f1)",
+  IT:       "linear-gradient(135deg,#06b6d4,#0ea5e9)",
+  ECE:      "linear-gradient(135deg,#f59e0b,#ef4444)",
+  EE:       "linear-gradient(135deg,#f97316,#f59e0b)",
+  ME:       "linear-gradient(135deg,#10b981,#059669)",
+  Civil:    "linear-gradient(135deg,#84cc16,#16a34a)",
+  Chemical: "linear-gradient(135deg,#ec4899,#f43f5e)",
+  ISE:      "linear-gradient(135deg,#a855f7,#6366f1)",
+  Aerospace:"linear-gradient(135deg,#14b8a6,#0ea5e9)",
+  Biotech:  "linear-gradient(135deg,#22c55e,#16a34a)",
+};
 
 export default function Library({ user }) {
   const [requests, setRequests] = useState([]);
   const [modal, setModal] = useState(null);
   const [tab, setTab] = useState("catalog");
   const [search, setSearch] = useState("");
-  const [genre, setGenre] = useState("all");
+  const [branch, setBranch] = useState("all");
+  const [genre, setGenre]   = useState("all");
 
   // Digital Library state
   const [running, setRunning]         = useState(false);
@@ -104,13 +255,20 @@ export default function Library({ user }) {
 
   const isRequested = (isbn) => requests.some(r => r.isbn === isbn && r.status !== "returned" && r.status !== "rejected");
 
-  const filtered = CATALOG.filter(b =>
-    (genre === "all" || b.genre === genre) &&
-    (b.title.toLowerCase().includes(search.toLowerCase()) || b.author.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filtered = CATALOG.filter(b => {
+    const q = search.toLowerCase();
+    return (
+      (branch === "all" || b.branch === branch) &&
+      (genre  === "all" || b.genre  === genre)  &&
+      (b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q))
+    );
+  });
 
   const statusBadge = (s) => ({ pending: "badge-warning", approved: "badge-info", returned: "badge-success", rejected: "badge-danger" }[s] || "badge-gray");
-  const genres = ["all", ...new Set(CATALOG.map(b => b.genre))];
+  const branches = ["all", ...Object.keys(BRANCH_COLORS)];
+  const genres   = ["all", ...new Set(
+    (branch === "all" ? CATALOG : CATALOG.filter(b => b.branch === branch)).map(b => b.genre)
+  )];
 
   const isOverdue = (r) => r.status === "approved" && r.dueDate && new Date(r.dueDate) < new Date();
 
@@ -132,26 +290,45 @@ export default function Library({ user }) {
 
       {tab === "catalog" && (
         <>
-          <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
-            <input placeholder="🔍 Search books or authors..." value={search}
-              onChange={e => setSearch(e.target.value)}
-              style={{ flex: 1, minWidth: 200, padding: "9px 14px", borderRadius: 8, border: "1px solid var(--border2)", fontSize: "0.875rem" }} />
-            <div className="tabs" style={{ margin: 0 }}>
-              {genres.map(g => (
-                <button key={g} className={`tab ${genre === g ? "active" : ""}`} onClick={() => setGenre(g)}
-                  style={{ textTransform: "capitalize" }}>{g}</button>
-              ))}
-            </div>
+          {/* Search */}
+          <input placeholder="🔍 Search books or authors..." value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ width: "100%", padding: "9px 14px", borderRadius: 8, border: "1px solid var(--border2)", fontSize: "0.875rem", marginBottom: 10 }} />
+
+          {/* Branch filter */}
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+            {branches.map(b => (
+              <button key={b} onClick={() => { setBranch(b); setGenre("all"); }}
+                className={`tab ${branch === b ? "active" : ""}`}
+                style={{ textTransform: "capitalize", fontSize: "0.78rem" }}>{b === "all" ? "All Branches" : b}</button>
+            ))}
           </div>
 
+          {/* Subject/genre filter */}
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
+            {genres.map(g => (
+              <button key={g} onClick={() => setGenre(g)}
+                className={`tab ${genre === g ? "active" : ""}`}
+                style={{ textTransform: "capitalize", fontSize: "0.75rem" }}>{g === "all" ? "All Subjects" : g}</button>
+            ))}
+          </div>
+
+          <p style={{ fontSize: "0.78rem", color: "var(--text3)", marginBottom: 12 }}>
+            Showing <strong>{filtered.length}</strong> of <strong>{CATALOG.length}</strong> books
+          </p>
+
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+            {filtered.length === 0 && (
+              <div style={{ gridColumn: "1/-1", textAlign: "center", padding: 40, color: "var(--text3)" }}>No books found.</div>
+            )}
             {filtered.map(book => {
               const requested = isRequested(book.isbn);
+              const bg = BRANCH_COLORS[book.branch] || "linear-gradient(135deg,#6366f1,#8b5cf6)";
               return (
                 <div key={book.isbn} className="card" style={{ display: "flex", gap: 14 }}>
                   <div style={{
                     width: 48, height: 64, borderRadius: 6, flexShrink: 0,
-                    background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                    background: bg,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: "1.4rem"
                   }}>📚</div>
@@ -159,8 +336,9 @@ export default function Library({ user }) {
                     <p style={{ fontWeight: 600, fontSize: "0.875rem", marginBottom: 2 }}>{book.title}</p>
                     <p style={{ fontSize: "0.78rem", color: "var(--text3)" }}>{book.author}</p>
                     <p style={{ fontSize: "0.72rem", color: "var(--text3)", marginTop: 2 }}>ISBN: {book.isbn}</p>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
-                      <span className="badge badge-purple" style={{ fontSize: "0.65rem" }}>{book.genre}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
+                      <span className="badge badge-purple" style={{ fontSize: "0.65rem" }}>{book.branch}</span>
+                      <span className="badge" style={{ fontSize: "0.65rem", background: "var(--surface2)", color: "var(--text3)" }}>{book.genre}</span>
                       {requested ? (
                         <span className="badge badge-warning" style={{ fontSize: "0.65rem" }}>Requested</span>
                       ) : (

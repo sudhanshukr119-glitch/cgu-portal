@@ -8,7 +8,7 @@ exports.getNotifications = async (req, res) => {
 
 exports.createNotification = async (req, res) => {
   try {
-    const notif = await Notification.create({ ...req.body, postedBy: req.user.id, date: new Date() });
+    const notif = await Notification.create({ ...req.body, postedBy: req.user._id, date: new Date() });
     req.io?.emit("notification:new", notif);
     res.json(notif);
   } catch (err) { res.status(500).json({ message: err.message }); }

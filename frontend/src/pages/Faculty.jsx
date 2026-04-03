@@ -5,28 +5,7 @@ const DEPARTMENTS = ["All", "Computer Science", "Electronics", "Mechanical", "Ci
 
 // Static faculty list — mirrors DEMO_USERS in Chat.jsx
 // Used as fallback so Faculty Directory always shows all 20 teachers even before seeding
-const STATIC_FACULTY = [
-  { name: "Dr. Anita Singh",     email: "anita@college.edu",      subject: "Data Structures",        department: "Computer Science", designation: "Professor",           isHOD: true,  phone: "919876543201" },
-  { name: "Prof. Rahul Verma",   email: "rahul.v@college.edu",    subject: "Operating Systems",       department: "Computer Science", designation: "Associate Professor", isHOD: false, phone: "919876543202" },
-  { name: "Ms. Pooja Iyer",      email: "pooja@college.edu",      subject: "Web Technologies",        department: "Computer Science", designation: "Assistant Professor", isHOD: false, phone: "919876543203" },
-  { name: "Mr. Karan Mehta",     email: "karan@college.edu",      subject: "Machine Learning",        department: "Computer Science", designation: "Assistant Professor", isHOD: false, phone: "919876543204" },
-  { name: "Dr. Suresh Nair",     email: "suresh@college.edu",     subject: "VLSI Design",             department: "Electronics",      designation: "Professor",           isHOD: true,  phone: "919876543205" },
-  { name: "Prof. Meena Pillai",  email: "meena@college.edu",      subject: "Signal Processing",       department: "Electronics",      designation: "Associate Professor", isHOD: false, phone: "919876543206" },
-  { name: "Mr. Arun Krishnan",   email: "arun@college.edu",       subject: "Embedded Systems",        department: "Electronics",      designation: "Assistant Professor", isHOD: false, phone: "919876543207" },
-  { name: "Ms. Divya Menon",     email: "divya@college.edu",      subject: "Communication Systems",   department: "Electronics",      designation: "Assistant Professor", isHOD: false, phone: "919876543208" },
-  { name: "Dr. Vikram Joshi",    email: "vikram@college.edu",     subject: "Thermodynamics",          department: "Mechanical",       designation: "Professor",           isHOD: true,  phone: "919876543209" },
-  { name: "Prof. Sunita Rao",    email: "sunita@college.edu",     subject: "Fluid Mechanics",         department: "Mechanical",       designation: "Associate Professor", isHOD: false, phone: "919876543210" },
-  { name: "Mr. Deepak Tiwari",   email: "deepak@college.edu",     subject: "Manufacturing Processes", department: "Mechanical",       designation: "Assistant Professor", isHOD: false, phone: "919876543211" },
-  { name: "Ms. Kavita Desai",    email: "kavita@college.edu",     subject: "CAD/CAM",                 department: "Mechanical",       designation: "Assistant Professor", isHOD: false, phone: "919876543212" },
-  { name: "Dr. Priya Sharma",    email: "priya@college.edu",      subject: "Structural Analysis",     department: "Civil",            designation: "Professor",           isHOD: true,  phone: "919876543213" },
-  { name: "Prof. Amit Gupta",    email: "amit@college.edu",       subject: "Geotechnical Engg.",      department: "Civil",            designation: "Associate Professor", isHOD: false, phone: "919876543214" },
-  { name: "Mr. Rohit Pandey",    email: "rohit@college.edu",      subject: "Environmental Engg.",     department: "Civil",            designation: "Assistant Professor", isHOD: false, phone: "919876543215" },
-  { name: "Ms. Neha Kulkarni",   email: "neha@college.edu",       subject: "Transportation Engg.",    department: "Civil",            designation: "Assistant Professor", isHOD: false, phone: "919876543216" },
-  { name: "Dr. Rajesh Patil",    email: "rajesh@college.edu",     subject: "Power Systems",           department: "Electrical",       designation: "Professor",           isHOD: true,  phone: "919876543217" },
-  { name: "Prof. Shalini Dubey", email: "shalini@college.edu",    subject: "Control Systems",         department: "Electrical",       designation: "Associate Professor", isHOD: false, phone: "919876543218" },
-  { name: "Mr. Nitin Bhatt",     email: "nitin@college.edu",      subject: "Electric Machines",       department: "Electrical",       designation: "Assistant Professor", isHOD: false, phone: "919876543219" },
-  { name: "Ms. Ritu Agarwal",    email: "ritu@college.edu",       subject: "Power Electronics",       department: "Electrical",       designation: "Assistant Professor", isHOD: false, phone: "919876543220" },
-];
+const STATIC_FACULTY = [];
 
 // Maps faculty email → WhatsApp number
 const PHONE_MAP = Object.fromEntries(STATIC_FACULTY.map(f => [f.email, f.phone]));
@@ -38,23 +17,13 @@ const WaIcon = () => (
   </svg>
 );
 
-export default function Faculty({ user }) {
+export default function Faculty({ user, setActive }) {
   const [faculty, setFaculty] = useState([]);
   const [search, setSearch] = useState("");
   const [dept, setDept] = useState("All");
 
   useEffect(() => {
-    API.get("/users/faculty").then(r => {
-      const dbEmails = new Set(r.data.map(f => f.email?.toLowerCase()));
-      // DB entries first, then static ones not yet in DB
-      const staticOnly = STATIC_FACULTY
-        .filter(f => !dbEmails.has(f.email.toLowerCase()))
-        .map(f => ({ ...f, _id: f.email })); // use email as key for static entries
-      setFaculty([...r.data, ...staticOnly]);
-    }).catch(() => {
-      // If API fails, show static list
-      setFaculty(STATIC_FACULTY.map(f => ({ ...f, _id: f.email })));
-    });
+    API.get("/users/faculty").then(r => setFaculty(r.data)).catch(() => {});
   }, []);
 
   const filtered = faculty.filter(f =>
@@ -131,7 +100,7 @@ export default function Faculty({ user }) {
               <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                 <span className="badge badge-purple">Faculty</span>
                 {f.isHOD && <span style={{ fontSize: "0.6rem", fontWeight: 700, background: "rgba(245,158,11,0.15)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 6, padding: "1px 6px" }}>HOD</span>}
-                <button className="btn btn-outline btn-xs" onClick={() => {}}>Message</button>
+                <button className="btn btn-outline btn-xs" onClick={() => setActive("chat", { id: f._id, name: f.name, role: "teacher", branch: f.department || "Other", subject: f.subject || "", hod: f.isHOD || false, online: false })}>Message</button>
                 {PHONE_MAP[f.email] && (
                   <a
                     href={`https://wa.me/${PHONE_MAP[f.email]}`}

@@ -7,12 +7,14 @@ const auth = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "No token provided" });
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret123");
+    const secret = process.env.JWT_SECRET;
+    if (!secret) return res.status(500).json({ message: "Server misconfiguration" });
+    const decoded = jwt.verify(token, secret);
     const user = await User.findById(decoded.id).select("-password");
     if (!user || !user.isActive) return res.status(401).json({ message: "Account not found or inactive" });
     req.user = user;
     next();
-  } catch {
+  } catch (err) {
     res.status(401).json({ message: "Invalid or expired token" });
   }
 };

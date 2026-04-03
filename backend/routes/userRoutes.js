@@ -12,6 +12,7 @@ router.get("/logs",      auth, requireRole("admin"), ctrl.getLogs);
 
 // All authenticated
 router.get("/faculty",   auth, ctrl.getFaculty);
+router.get("/students",  auth, ctrl.getStudents);
 router.put("/me/avatar", auth, ctrl.updateAvatar);
 
 module.exports = router;

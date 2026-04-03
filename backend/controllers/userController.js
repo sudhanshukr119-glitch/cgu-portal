@@ -83,9 +83,21 @@ exports.updateAvatar = async (req, res) => {
     // Limit base64 size to ~2MB
     if (avatar.length > 2 * 1024 * 1024 * 1.37)
       return res.status(400).json({ message: "Image too large. Max 2MB." });
-    const user = await User.findByIdAndUpdate(req.user.id, { avatar }, { new: true }).select("-password");
+    const user = await User.findByIdAndUpdate(req.user._id, { avatar }, { new: true }).select("-password");
     res.json({ avatar: user.avatar });
   } catch (err) { res.status(500).json({ message: err.message }); }
+};
+
+// Get students list (accessible to all authenticated users)
+exports.getStudents = async (req, res) => {
+  try {
+    const students = await User.find({ role: "student", isActive: true })
+      .select("name email department class rollNo batch phone")
+      .sort({ name: 1 });
+    res.json(students);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 // Get faculty list (accessible to all authenticated users)

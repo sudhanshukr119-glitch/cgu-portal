@@ -610,6 +610,10 @@ select option { background: var(--surface); }
   overflow: hidden;
 }
 
+.login-page.with-bg-image {
+  background: none;
+}
+
 .login-bg {
   position: absolute;
   inset: 0;

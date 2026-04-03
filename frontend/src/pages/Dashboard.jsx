@@ -21,6 +21,8 @@ import Users from "./Users";
 import Leaves from "./Leaves";
 import PremiumDashboard from "./PremiumDashboard";
 import IDCard from "./IDCard";
+import Marketplace from "./Marketplace";
+import Chatbot from "../components/Chatbot";
 
 const NAV_ALL = [
   { key: "home",          label: "Dashboard",       icon: "⬡",  section: "overview", roles: ["student","teacher","admin"] },
@@ -42,6 +44,7 @@ const NAV_ALL = [
   { key: "dispensary",    label: "Medical",         icon: "🏥", section: "campus",   roles: ["student","admin"] },
   { key: "events",        label: "Events",          icon: "🎉", section: "campus",   roles: ["student","teacher","admin"] },
   { key: "lostfound",     label: "Lost & Found",    icon: "🔍", section: "campus",   roles: ["student","teacher","admin"] },
+  { key: "marketplace",   label: "Marketplace",     icon: "🛒", section: "campus",   roles: ["student"] },
   { key: "tech",          label: "Tech Support",    icon: "🔧", section: "support",  roles: ["student","teacher","admin"] },
 ];
 
@@ -61,7 +64,7 @@ const PAGE_TITLES = {
   timetable: "Timetable", attendance: "Attendance", assignments: "Assignments",
   results: "Results & GPA", library: "Library", faculty: "Faculty Directory",
   fees: "Fees & Finance", hostel: "Hostel", food: "Canteen",
-  dispensary: "Medical", events: "Events", lostfound: "Lost & Found", tech: "Tech Support",
+  dispensary: "Medical", events: "Events", lostfound: "Lost & Found", marketplace: "Marketplace", tech: "Tech Support",
 };
 
 const ROLE_COLORS = { admin: "#f87171", teacher: "#60a5fa", student: "#34d399" };
@@ -69,6 +72,7 @@ const ROLE_BADGES = { admin: "badge-danger", teacher: "badge-info", student: "ba
 
 export default function Dashboard({ setPage }) {
   const [active, setActive]         = useState("home");
+  const [chatInitialUser, setChatInitialUser] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch]         = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -83,7 +87,11 @@ export default function Dashboard({ setPage }) {
     setPage("login");
   };
 
-  const navigate = key => { setActive(key); setSidebarOpen(false); setSearch(""); setSearchOpen(false); };
+  const navigate = (key, extra) => {
+    if (key === "chat" && extra) setChatInitialUser(extra);
+    else setChatInitialUser(null);
+    setActive(key); setSidebarOpen(false); setSearch(""); setSearchOpen(false);
+  };
 
   // Search filter
   const searchResults = search.length > 1
@@ -108,7 +116,8 @@ export default function Dashboard({ setPage }) {
       results: <Results {...props} />,
       events: <Events {...props} />,
       lostfound: <LostFound {...props} />,
-      chat: <Chat {...props} />,
+      marketplace: <Marketplace {...props} />,
+      chat: <Chat {...props} initialUser={chatInitialUser} />,
       users: <Users {...props} />,
       analytics: <PremiumDashboard {...props} />,
       idcard: <IDCard {...props} />,
@@ -248,6 +257,7 @@ export default function Dashboard({ setPage }) {
           </ErrorBoundary>
         </main>
       </div>
+      <Chatbot user={user} />
     </div>
   );
 }

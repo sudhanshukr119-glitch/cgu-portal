@@ -9,7 +9,10 @@ exports.getTickets = async (req, res) => {
 
 exports.createTicket = async (req, res) => {
   try {
-    res.json(await TechSupport.create({ ...req.body, userId: req.user.id }));
+    const { category, description, priority, userName } = req.body;
+    if (!category || !description) return res.status(400).json({ message: "Category and description are required" });
+    const ticket = await TechSupport.create({ category, description, priority: priority || "medium", userName, userId: req.user._id });
+    res.status(201).json(ticket);
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 

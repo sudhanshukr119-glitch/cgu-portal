@@ -4,7 +4,7 @@ import API from "../api";
 export default function TechSupport({ user }) {
   const [tickets, setTickets] = useState([]);
   const [modal, setModal] = useState(false);
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState({ category: "", priority: "medium", description: "" });
 
   useEffect(() => { API.get("/tech").then(r => setTickets(r.data)).catch(() => {}); }, []);
 
@@ -13,7 +13,8 @@ export default function TechSupport({ user }) {
     try {
       const res = await API.post("/tech", { ...form, userName: user.name });
       setTickets([res.data, ...tickets]);
-      setModal(false); setForm({});
+      setModal(false);
+      setForm({ category: "", priority: "medium", description: "" });
     } catch (err) { alert(err?.response?.data?.message || "Failed to submit ticket"); }
   };
 
@@ -33,7 +34,7 @@ export default function TechSupport({ user }) {
     <div className="page">
       <div className="section-header">
         <h2 className="section-title">🔧 Technical Assistance</h2>
-        <button className="btn btn-primary btn-sm" onClick={() => setModal(true)}>+ Raise Ticket</button>
+        <button className="btn btn-primary btn-sm" onClick={() => { setForm({ category: "", priority: "medium", description: "" }); setModal(true); }}>+ Raise Ticket</button>
       </div>
 
       <div className="stat-grid" style={{ marginBottom: 20 }}>
@@ -89,7 +90,7 @@ export default function TechSupport({ user }) {
               <div className="form-grid">
                 <div className="form-group">
                   <label>Category</label>
-                  <select required onChange={e => setForm({ ...form, category: e.target.value })}>
+                  <select required value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
                     <option value="">Select category</option>
                     <option value="wifi">WiFi / Network</option>
                     <option value="lab">Computer Lab</option>
@@ -101,7 +102,7 @@ export default function TechSupport({ user }) {
                 </div>
                 <div className="form-group">
                   <label>Priority</label>
-                  <select onChange={e => setForm({ ...form, priority: e.target.value })}>
+                  <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}>
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
                     <option value="high">High</option>
@@ -111,6 +112,7 @@ export default function TechSupport({ user }) {
               <div className="form-group" style={{ marginTop: 12 }}>
                 <label>Description</label>
                 <textarea required rows={4} placeholder="Describe the technical issue..."
+                  value={form.description}
                   onChange={e => setForm({ ...form, description: e.target.value })} />
               </div>
               <button className="btn btn-primary" style={{ marginTop: 14, width: "100%", justifyContent: "center" }} type="submit">

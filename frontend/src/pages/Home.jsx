@@ -523,18 +523,6 @@ function StudentDashboard({ user, setActive }) {
         </div>
       </div>
 
-      {/* Quick Access */}
-      <div className="card" style={{ marginBottom: 16 }}>
-        <p className="chart-title">⚡ Quick Access</p>
-        <div className="quick-grid">
-          {[["🗓","Timetable","timetable"],["📊","Attendance","attendance"],["📝","Assignments","assignments"],["🏅","Results","results"],["📚","Library","library"],["💳","Fees","fees"],["🏥","Medical","dispensary"],["📋","Leave","leaves"],["💬","Messages","chat"],["🔍","Lost & Found","lostfound"]].map(([icon, label, key]) => (
-            <div key={key} className="quick-card" onClick={() => setActive(key)}>
-              <div className="icon">{icon}</div><p>{label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
       <ExamCountdown />
 
       <Calendar events={events} assignments={[]} />

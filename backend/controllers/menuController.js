@@ -2,6 +2,11 @@ const MenuItem = require("../models/MenuItem");
 
 // Default menu — 10 items per meal category
 const DEFAULT_MENU = [
+  // ── BREAKFAST (Non-Veg) ──
+  { name: "Egg Omelette",         price: 40,  category: "breakfast" },
+  { name: "Boiled Eggs (2 pcs)",  price: 30,  category: "breakfast" },
+  { name: "Chicken Keema Paratha",price: 70,  category: "breakfast" },
+
   // ── BREAKFAST ──
   { name: "Idli Sambar",          price: 30,  category: "breakfast" },
   { name: "Masala Dosa",          price: 45,  category: "breakfast" },
@@ -13,6 +18,13 @@ const DEFAULT_MENU = [
   { name: "Rava Idli",            price: 30,  category: "breakfast" },
   { name: "Medu Vada",            price: 30,  category: "breakfast" },
   { name: "Cornflakes with Milk", price: 35,  category: "breakfast" },
+
+  // ── LUNCH (Non-Veg) ──
+  { name: "Chicken Biryani",      price: 130, category: "lunch" },
+  { name: "Mutton Curry Rice",    price: 150, category: "lunch" },
+  { name: "Fish Fry + Rice",      price: 120, category: "lunch" },
+  { name: "Egg Fried Rice",       price: 90,  category: "lunch" },
+  { name: "Non-Veg Thali",        price: 160, category: "lunch" },
 
   // ── LUNCH ──
   { name: "Dal Rice",             price: 60,  category: "lunch" },
@@ -26,6 +38,13 @@ const DEFAULT_MENU = [
   { name: "Egg Curry Rice",       price: 80,  category: "lunch" },
   { name: "South Indian Meals",   price: 100, category: "lunch" },
 
+  // ── DINNER (Non-Veg) ──
+  { name: "Chicken Curry + Roti", price: 130, category: "dinner" },
+  { name: "Mutton Biryani",       price: 160, category: "dinner" },
+  { name: "Fish Curry Rice",      price: 130, category: "dinner" },
+  { name: "Egg Masala + Roti",    price: 85,  category: "dinner" },
+  { name: "Chicken Fried Rice",   price: 120, category: "dinner" },
+
   // ── DINNER ──
   { name: "Roti Sabzi",           price: 55,  category: "dinner" },
   { name: "Paneer Curry",         price: 80,  category: "dinner" },
@@ -37,6 +56,11 @@ const DEFAULT_MENU = [
   { name: "Egg Bhurji + Roti",    price: 70,  category: "dinner" },
   { name: "Khichdi + Papad",      price: 55,  category: "dinner" },
   { name: "Chicken Curry Rice",   price: 110, category: "dinner" },
+
+  // ── SNACK (Non-Veg) ──
+  { name: "Chicken Roll",         price: 60,  category: "snack" },
+  { name: "Egg Puff",             price: 25,  category: "snack" },
+  { name: "Chicken Nuggets",      price: 70,  category: "snack" },
 
   // ── SNACK ──
   { name: "Samosa",               price: 15,  category: "snack" },

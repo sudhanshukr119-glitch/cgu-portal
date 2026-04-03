@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 const signToken = (user) =>
-  jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || "secret123", { expiresIn: "7d" });
+  jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 exports.register = async (req, res) => {
   try {
@@ -14,6 +14,8 @@ exports.register = async (req, res) => {
 
     const exists = await User.findOne({ email: req.body.email });
     if (exists) return res.status(409).json({ message: "Email already registered" });
+    if (!req.body.password || req.body.password.length < 6)
+      return res.status(400).json({ message: "Password must be at least 6 characters" });
     const hashed = await bcrypt.hash(req.body.password, 12);
     const user = new User({ ...req.body, password: hashed });
     await user.save();

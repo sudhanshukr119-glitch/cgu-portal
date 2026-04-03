@@ -8,20 +8,26 @@ const ITEM_EMOJI = {
   "Idli Sambar": "🫓", "Masala Dosa": "🫓", "Poha": "🍚", "Upma": "🍜",
   "Aloo Paratha": "🫓", "Bread Omelette": "🍳", "Puri Bhaji": "🫓",
   "Rava Idli": "🫓", "Medu Vada": "🍩", "Cornflakes with Milk": "🥣",
+  "Egg Omelette": "🍳", "Boiled Eggs (2 pcs)": "🥚", "Chicken Keema Paratha": "🫓",
   // Lunch
   "Dal Rice": "🍚", "Rajma Chawal": "🍚", "Veg Thali": "🍽️",
   "Chole Bhature": "🫓", "Paneer Butter Masala": "🍛", "Veg Biryani": "🍛",
   "Kadhi Chawal": "🍚", "Mix Veg Curry + Roti": "🍛", "Egg Curry Rice": "🍳",
   "South Indian Meals": "🍽️",
+  "Chicken Biryani": "🍗", "Mutton Curry Rice": "🍖", "Fish Fry + Rice": "🐟",
+  "Egg Fried Rice": "🍳", "Non-Veg Thali": "🍽️",
   // Dinner
   "Roti Sabzi": "🫓", "Paneer Curry": "🍛", "Dal Makhani + Rice": "🍚",
   "Veg Pulao": "🍛", "Butter Naan + Gravy": "🫓", "Fried Rice": "🍛",
   "Palak Paneer + Roti": "🍛", "Egg Bhurji + Roti": "🍳",
-  "Khichdi + Papad": "🍚", "Chicken Curry Rice": "🍛",
+  "Khichdi + Papad": "🍚", "Chicken Curry Rice": "🍗",
+  "Chicken Curry + Roti": "🍗", "Mutton Biryani": "🍖", "Fish Curry Rice": "🐟",
+  "Egg Masala + Roti": "🍳", "Chicken Fried Rice": "🍗",
   // Snack
   "Samosa": "🥟", "Tea": "☕", "Cold Coffee": "🧃", "Veg Sandwich": "🥪",
   "Maggi Noodles": "🍜", "Bread Pakora": "🥞", "Lassi": "🥛",
   "Fresh Lime Soda": "🍋", "Banana Shake": "🍌", "Pav Bhaji": "🍞",
+  "Chicken Roll": "🌯", "Egg Puff": "🥐", "Chicken Nuggets": "🍗",
 };
 
 export default function Food({ user }) {

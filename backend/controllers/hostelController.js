@@ -8,14 +8,14 @@ const notifyAdmin = (title, message, type = "info", refId = "") =>
 
 exports.getRequests = async (req, res) => {
   try {
-    const filter = req.user.role === "student" ? { studentId: req.user.id } : {};
+    const filter = req.user.role === "student" ? { studentId: req.user._id } : {};
     res.json(await Hostel.find(filter).sort({ createdAt: -1 }));
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
 exports.createRequest = async (req, res) => {
   try {
-    res.json(await Hostel.create({ ...req.body, studentId: req.user.id }));
+    res.json(await Hostel.create({ ...req.body, studentId: req.user._id }));
   } catch (err) { res.status(500).json({ message: err.message }); }
 };
 
@@ -26,7 +26,7 @@ exports.updateRequest = async (req, res) => {
 
     // Student can only confirm resolution OR add a progress note on their own request
     if (req.user.role === "student") {
-      if (request.studentId.toString() !== req.user.id)
+    if (request.studentId.toString() !== req.user._id.toString())
         return res.status(403).json({ message: "Not your request" });
 
       // Student updating status on their own request

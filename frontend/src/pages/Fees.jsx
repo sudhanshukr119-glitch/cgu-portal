@@ -364,8 +364,9 @@ export default function Fees({ user }) {
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: 12, padding: "10px 14px", background: "rgba(99,102,241,0.06)", border: "1px solid rgba(99,102,241,0.2)", borderRadius: 10, fontSize: "0.78rem", color: "var(--text3)" }}>
-                Payments are secured by Razorpay. Accepted: UPI, Debit/Credit Card, Net Banking, Wallets.
+              <div style={{ marginTop: 12, padding: "12px 16px", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 10, fontSize: "0.82rem", color: "var(--text3)", display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontSize: "1.2rem" }}>🔔</span>
+                <span><strong style={{ color: "#f59e0b" }}>Online Payment Coming Soon!</strong> Currently please visit the college accounts office to pay your fees in person.</span>
               </div>
             </div>
           )}
