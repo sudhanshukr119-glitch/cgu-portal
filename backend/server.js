@@ -10,12 +10,18 @@ const connectDB = require("./config/db");
 const app    = express();
 const server = http.createServer(app);
 
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "http://localhost:3000")
-  .split(",").map(o => o.trim());
+const ALLOWED_ORIGINS = [
+  ...(process.env.ALLOWED_ORIGINS || "").split(",").map(o => o.trim()).filter(Boolean),
+  "http://localhost:3000",
+  /https:\/\/.*\.vercel\.app$/,
+];
+
+const isOriginAllowed = (origin) =>
+  !origin || ALLOWED_ORIGINS.some(o => o instanceof RegExp ? o.test(origin) : o === origin);
 
 const io = new Server(server, {
   cors: {
-    origin: ALLOWED_ORIGINS,
+    origin: (origin, cb) => cb(isOriginAllowed(origin) ? null : new Error("Not allowed by CORS"), isOriginAllowed(origin)),
     methods: ["GET","POST","PUT","DELETE"],
     credentials: true,
   }
@@ -26,10 +32,8 @@ app.use(helmet());
 
 // CORS — restrict to known origins
 app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-    cb(new Error("Not allowed by CORS"));
-  },
+  origin: (origin, cb) => cb(isOriginAllowed(origin) ? null : new Error("Not allowed by CORS"), isOriginAllowed(origin)),
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
