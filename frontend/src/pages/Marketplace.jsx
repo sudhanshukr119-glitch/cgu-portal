@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import API from "../api";
 import { io } from "socket.io-client";
 
-const socket = io(process.env.REACT_APP_SOCKET_URL || "http://localhost:5000", { autoConnect: true });
+const socket = io(process.env.REACT_APP_SOCKET_URL || "https://cgu-portal.onrender.com", { autoConnect: true });
 
 const CATEGORIES = ["All", "Books", "Electronics", "Stationery", "Clothing", "Furniture", "Other"];
 
